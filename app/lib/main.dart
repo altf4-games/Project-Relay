@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/connection/providers/connection_provider.dart';
+import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/connection/screens/login_screen.dart';
 
 void main() {
@@ -14,7 +15,16 @@ class RelayApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => ConnectionProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => ConnectionProvider()),
+        ChangeNotifierProxyProvider<ConnectionProvider, DashboardProvider>(
+          create: (context) => DashboardProvider(
+            connectionProvider: context.read<ConnectionProvider>(),
+          ),
+          update: (context, connectionProvider, previous) =>
+              previous ?? DashboardProvider(connectionProvider: connectionProvider),
+        ),
+      ],
       child: MaterialApp(
         title: 'Relay',
         theme: AppTheme.darkTheme,
