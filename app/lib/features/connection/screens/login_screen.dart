@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _passwordController.text = config.password!;
           }
         });
-        
+
         _autoConnect(config);
       }
     } catch (e) {

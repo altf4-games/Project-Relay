@@ -137,49 +137,85 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStaggeredGrid(DashboardProvider dashboardProvider, ConnectionProvider connectionProvider) {
+  Widget _buildStaggeredGrid(
+    DashboardProvider dashboardProvider,
+    ConnectionProvider connectionProvider,
+  ) {
     final allWidgets = <WidgetData>[];
     for (final plugin in dashboardProvider.plugins) {
       allWidgets.addAll(plugin.widgets);
     }
 
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.all(16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final widget = allWidgets[index];
-                if (widget.gridWidth == 2) {
-                  return GridTile(
-                    child: Container(
-                      margin: EdgeInsets.only(
-                        right: index % 2 == 0 ? MediaQuery.of(context).size.width / 2 + 6 : 0,
-                      ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final cardWidth = (width - 12) / 2;
+          
+          final List<Widget> rows = [];
+          int i = 0;
+          
+          while (i < allWidgets.length) {
+            final widget = allWidgets[i];
+            
+            if (widget.gridWidth == 2) {
+              rows.add(
+                SizedBox(
+                  width: width,
+                  height: 140,
+                  child: WidgetFactory.buildWidget(
+                    widget,
+                    onActionExecute: () => _executeCommand(widget, connectionProvider),
+                  ),
+                ),
+              );
+              i++;
+            } else {
+              final leftWidget = widget;
+              final rightWidget = (i + 1 < allWidgets.length && allWidgets[i + 1].gridWidth != 2)
+                  ? allWidgets[i + 1]
+                  : null;
+              
+              rows.add(
+                Row(
+                  children: [
+                    SizedBox(
+                      width: cardWidth,
+                      height: 140,
                       child: WidgetFactory.buildWidget(
-                        widget,
-                        onActionExecute: () => _executeCommand(widget, connectionProvider),
+                        leftWidget,
+                        onActionExecute: () => _executeCommand(leftWidget, connectionProvider),
                       ),
                     ),
-                  );
-                }
-                return WidgetFactory.buildWidget(
-                  widget,
-                  onActionExecute: () => _executeCommand(widget, connectionProvider),
-                );
-              },
-              childCount: allWidgets.length,
-            ),
-          ),
-        ),
-      ],
+                    if (rightWidget != null) ...[
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: cardWidth,
+                        height: 140,
+                        child: WidgetFactory.buildWidget(
+                          rightWidget,
+                          onActionExecute: () => _executeCommand(rightWidget, connectionProvider),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+              
+              i += rightWidget != null ? 2 : 1;
+            }
+            
+            if (i < allWidgets.length) {
+              rows.add(const SizedBox(height: 12));
+            }
+          }
+          
+          return Column(
+            children: rows,
+          );
+        },
+      ),
     );
   }
 }
