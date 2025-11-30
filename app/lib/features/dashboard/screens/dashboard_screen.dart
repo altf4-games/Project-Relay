@@ -26,7 +26,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final connectionProvider = context.watch<ConnectionProvider>();
     final dashboardProvider = context.watch<DashboardProvider>();
-    
+
     final label =
         connectionProvider.currentConfig?.label ??
         connectionProvider.currentConfig?.host ??
@@ -53,61 +53,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: dashboardProvider.isLoading
             ? const Center(child: CircularProgressIndicator())
             : dashboardProvider.errorMessage != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, size: 64, color: AppTheme.errorRed),
-                        const SizedBox(height: 16),
-                        Text(
-                          dashboardProvider.errorMessage!,
-                          style: const TextStyle(color: AppTheme.errorRed),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () => dashboardProvider.fetchDashboard(),
-                          child: const Text('Retry'),
-                        ),
-                      ],
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: AppTheme.errorRed,
                     ),
-                  )
-                : dashboardProvider.plugins.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.inbox, size: 64, color: AppTheme.textGrey),
-                            const SizedBox(height: 16),
-                            const Text('No plugins data'),
-                          ],
-                        ),
-                      )
-                    : GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1.2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                        itemCount: dashboardProvider.plugins.fold<int>(
-                          0,
-                          (sum, plugin) => sum + plugin.widgets.length,
-                        ),
-                        itemBuilder: (context, index) {
-                          int currentIndex = 0;
-                          for (final plugin in dashboardProvider.plugins) {
-                            for (final widget in plugin.widgets) {
-                              if (currentIndex == index) {
-                                return WidgetFactory.buildWidget(widget);
-                              }
-                              currentIndex++;
-                            }
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
+                    const SizedBox(height: 16),
+                    Text(
+                      dashboardProvider.errorMessage!,
+                      style: const TextStyle(color: AppTheme.errorRed),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => dashboardProvider.fetchDashboard(),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+            : dashboardProvider.plugins.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.inbox, size: 64, color: AppTheme.textGrey),
+                    const SizedBox(height: 16),
+                    const Text('No plugins data'),
+                  ],
+                ),
+              )
+            : GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: dashboardProvider.plugins.fold<int>(
+                  0,
+                  (sum, plugin) => sum + plugin.widgets.length,
+                ),
+                itemBuilder: (context, index) {
+                  int currentIndex = 0;
+                  for (final plugin in dashboardProvider.plugins) {
+                    for (final widget in plugin.widgets) {
+                      if (currentIndex == index) {
+                        return WidgetFactory.buildWidget(widget);
+                      }
+                      currentIndex++;
+                    }
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
       ),
     );
   }

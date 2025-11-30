@@ -8,13 +8,51 @@ const __dirname = path.dirname(__filename);
 
 const PLUGINS_DIR = path.join(__dirname, "../../plugins");
 
-const executeScript = (scriptPath) => {
-  return new Promise((resolve, reject) => {
+// Cache for Python command to avoid repeated checks
+let pythonCommand = null;
+
+const detectPythonCommand = () => {
+  return new Promise((resolve) => {
+    if (pythonCommand) {
+      return resolve(pythonCommand);
+    }
+
+    // Try python3 first (common on Linux)
+    exec("python3 --version", (error) => {
+      if (!error) {
+        pythonCommand = "python3";
+        return resolve("python3");
+      }
+
+      // Fall back to python
+      exec("python --version", (error) => {
+        if (!error) {
+          pythonCommand = "python";
+          return resolve("python");
+        }
+
+        // No Python found
+        resolve(null);
+      });
+    });
+  });
+};
+
+const executeScript = async (scriptPath) => {
+  return new Promise(async (resolve, reject) => {
     const ext = path.extname(scriptPath);
     let command;
 
     if (ext === ".py") {
-      command = `python "${scriptPath}"`;
+      const pythonCmd = await detectPythonCommand();
+      if (!pythonCmd) {
+        return resolve({
+          title: path.basename(scriptPath, ext),
+          error: "Python not found (tried python3 and python)",
+          widgets: [],
+        });
+      }
+      command = `${pythonCmd} "${scriptPath}"`;
     } else if (ext === ".sh") {
       command = `bash "${scriptPath}"`;
     } else if (ext === ".js") {

@@ -47,20 +47,21 @@ class WidgetFactory {
           children: [
             Text(
               data['label'] as String? ?? 'LOGS',
-              style: const TextStyle(
-                color: AppTheme.textGrey,
-                fontSize: 10,
-              ),
+              style: const TextStyle(color: AppTheme.textGrey, fontSize: 10),
             ),
             const SizedBox(height: 8),
-            ...logs.take(5).map((log) => Text(
-              log.toString(),
-              style: const TextStyle(
-                color: AppTheme.electricGreen,
-                fontSize: 10,
-                fontFamily: 'monospace',
-              ),
-            )),
+            ...logs
+                .take(5)
+                .map(
+                  (log) => Text(
+                    log.toString(),
+                    style: const TextStyle(
+                      color: AppTheme.electricGreen,
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
           ],
         ),
       ),

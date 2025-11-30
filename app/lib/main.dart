@@ -22,7 +22,8 @@ class RelayApp extends StatelessWidget {
             connectionProvider: context.read<ConnectionProvider>(),
           ),
           update: (context, connectionProvider, previous) =>
-              previous ?? DashboardProvider(connectionProvider: connectionProvider),
+              previous ??
+              DashboardProvider(connectionProvider: connectionProvider),
         ),
       ],
       child: MaterialApp(

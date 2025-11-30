@@ -58,11 +58,11 @@ class SshClientService {
       final session = await _client!.execute(command);
       final output = await utf8.decoder.bind(session.stdout).join();
       final stderr = await utf8.decoder.bind(session.stderr).join();
-      
+
       if (stderr.isNotEmpty) {
         throw Exception('Command error: $stderr');
       }
-      
+
       return output;
     } catch (e) {
       throw Exception('Command execution failed: ${e.toString()}');

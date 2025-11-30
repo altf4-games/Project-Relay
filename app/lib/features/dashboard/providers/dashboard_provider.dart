@@ -5,7 +5,7 @@ import '../../../features/connection/providers/connection_provider.dart';
 
 class DashboardProvider extends ChangeNotifier {
   final ConnectionProvider connectionProvider;
-  
+
   List<PluginData> _plugins = [];
   bool _isLoading = false;
   String? _errorMessage;
@@ -35,41 +35,44 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final command = 'curl -s -H "x-agent-secret: ${config.agentSecret}" http://127.0.0.1:${config.agentPort}/api/status';
+      final command =
+          'curl -s -H "x-agent-secret: ${config.agentSecret}" http://127.0.0.1:${config.agentPort}/api/status';
       final result = await connectionProvider.sshClient.execute(command);
-      
+
       if (result.isEmpty) {
         throw Exception('Empty response from server');
       }
-      
+
       if (kDebugMode) {
         print('=== Dashboard API Response ===');
         print('Raw output: $result');
         print('Output length: ${result.length}');
         print('=============================');
       }
-      
+
       dynamic jsonData;
       try {
         jsonData = jsonDecode(result);
       } catch (e) {
         throw Exception('Invalid JSON response: $result');
       }
-      
+
       if (kDebugMode) {
         print('Parsed JSON: $jsonData');
         print('JSON keys: ${(jsonData as Map).keys}');
       }
-      
+
       if (jsonData['status'] == 'error') {
         throw Exception(jsonData['error'] ?? 'Unknown error from server');
       }
-      
+
       final dataList = jsonData['data'];
       if (dataList == null) {
-        throw Exception('No data field in response. Available fields: ${(jsonData as Map).keys.join(", ")}');
+        throw Exception(
+          'No data field in response. Available fields: ${(jsonData as Map).keys.join(", ")}',
+        );
       }
-      
+
       _plugins = (dataList as List<dynamic>)
           .map((item) => PluginData.fromJson(item as Map<String, dynamic>))
           .toList();

@@ -30,9 +30,7 @@ class MetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: AppTheme.deepCharcoal.withValues(alpha: 0.5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
