@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../features/dashboard/widgets/metric_card.dart';
+import '../../features/dashboard/widgets/progress_bar_widget.dart';
+import '../../features/dashboard/widgets/action_button_widget.dart';
 import '../theme/app_theme.dart';
 import 'models/widget_data.dart';
 
 class WidgetFactory {
-  static Widget buildWidget(WidgetData widgetData) {
+  static Widget buildWidget(WidgetData widgetData, {VoidCallback? onActionExecute}) {
     switch (widgetData.type) {
       case 'metric_card':
         return _buildMetricCard(widgetData.data);
+      case 'progress_bar':
+        return _buildProgressBar(widgetData.data);
       case 'log_stream':
         return _buildLogStream(widgetData.data);
       case 'action_button':
-        return _buildActionButton(widgetData.data);
+        return _buildActionButton(widgetData.data, onActionExecute);
       default:
         return Card(
           color: AppTheme.errorRed.withValues(alpha: 0.2),
@@ -68,14 +72,19 @@ class WidgetFactory {
     );
   }
 
-  static Widget _buildActionButton(Map<String, dynamic> data) {
-    return OutlinedButton(
-      onPressed: () {},
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppTheme.electricGreen,
-        side: const BorderSide(color: AppTheme.electricGreen),
-      ),
-      child: Text(data['label'] as String? ?? 'Action'),
+  static Widget _buildProgressBar(Map<String, dynamic> data) {
+    return ProgressBarWidget(
+      label: data['label'] as String? ?? 'Progress',
+      value: (data['value'] as num?)?.toDouble() ?? 0.0,
+      max: (data['max'] as num?)?.toDouble() ?? 100.0,
+    );
+  }
+
+  static Widget _buildActionButton(Map<String, dynamic> data, VoidCallback? onExecute) {
+    return ActionButtonWidget(
+      label: data['label'] as String? ?? 'Action',
+      command: data['command'] as String? ?? '',
+      onExecute: onExecute ?? () {},
     );
   }
 }

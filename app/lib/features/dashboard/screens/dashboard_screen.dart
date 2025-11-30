@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/sdui/widget_factory.dart';
+import '../../../core/sdui/models/widget_data.dart';
 import '../../../features/connection/providers/connection_provider.dart';
 import '../../../features/terminal/screens/terminal_screen.dart';
 import '../providers/dashboard_provider.dart';
@@ -22,6 +23,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  void _executeCommand(WidgetData widget, ConnectionProvider connectionProvider) async {
+    if (widget.type != 'action_button') return;
+    
+    final command = widget.data['command'] as String?;
+    if (command == null || command.isEmpty) return;
+
+    try {
+      await connectionProvider.sshClient.execute(command);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Command executed successfully'),
+            backgroundColor: AppTheme.electricGreen,
+          ),
+        );
+        
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          context.read<DashboardProvider>().fetchDashboard();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Command failed: $e'),
+            backgroundColor: AppTheme.errorRed,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final connectionProvider = context.watch<ConnectionProvider>();
@@ -36,6 +71,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Text(label),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: dashboardProvider.isLoading
+                ? null
+                : () => dashboardProvider.fetchDashboard(),
+            tooltip: 'Refresh',
+          ),
           IconButton(
             icon: const Icon(Icons.terminal),
             onPressed: () {
@@ -104,7 +146,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   for (final plugin in dashboardProvider.plugins) {
                     for (final widget in plugin.widgets) {
                       if (currentIndex == index) {
-                        return WidgetFactory.buildWidget(widget);
+                        return WidgetFactory.buildWidget(
+                          widget,
+                          onActionExecute: () => _executeCommand(widget, connectionProvider),
+                        );
                       }
                       currentIndex++;
                     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../utils/key_storage.dart';
 import '../models/server_config.dart';
 import '../providers/connection_provider.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
@@ -27,6 +28,41 @@ class _LoginScreenState extends State<LoginScreen> {
   AuthMethod _authMethod = AuthMethod.key;
   bool _obscurePassword = true;
   bool _obscureAgentSecret = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedConfig();
+  }
+
+  void _loadSavedConfig() async {
+    try {
+      final config = await KeyStorage.loadConfig();
+      if (config != null && mounted) {
+        setState(() {
+          _hostController.text = config.host;
+          _usernameController.text = config.username;
+          _agentPortController.text = config.agentPort.toString();
+          _agentSecretController.text = config.agentSecret;
+          _labelController.text = config.label ?? '';
+          
+          if (config.privateKey != null) {
+            _authMethod = AuthMethod.key;
+            _privateKeyController.text = config.privateKey!;
+          } else if (config.password != null) {
+            _authMethod = AuthMethod.password;
+            _passwordController.text = config.password!;
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load saved config: $e')),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -60,6 +96,16 @@ class _LoginScreenState extends State<LoginScreen> {
           ? null
           : _labelController.text.trim(),
     );
+
+    try {
+      await KeyStorage.saveConfig(config);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save config: $e')),
+        );
+      }
+    }
 
     final provider = context.read<ConnectionProvider>();
     await provider.connect(config);
