@@ -2,19 +2,26 @@ class WidgetData {
   final String title;
   final String type;
   final Map<String, dynamic> data;
+  final int gridWidth;
 
-  WidgetData({required this.title, required this.type, required this.data});
+  WidgetData({
+    required this.title,
+    required this.type,
+    required this.data,
+    this.gridWidth = 1,
+  });
 
   factory WidgetData.fromJson(Map<String, dynamic> json) {
     return WidgetData(
       title: json['title'] as String? ?? 'Unknown',
       type: json['type'] as String? ?? 'unknown',
       data: json['data'] as Map<String, dynamic>? ?? {},
+      gridWidth: json['gridWidth'] as int? ?? 1,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'title': title, 'type': type, 'data': data};
+    return {'title': title, 'type': type, 'data': data, 'gridWidth': gridWidth};
   }
 }
 

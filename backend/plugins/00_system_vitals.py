@@ -56,7 +56,8 @@ try:
                     "label": "Memory",
                     "value": memory.percent,
                     "max": 100
-                }
+                },
+                "gridWidth": 2
             }
         ]
     }

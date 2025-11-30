@@ -23,15 +23,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  void _executeCommand(WidgetData widget, ConnectionProvider connectionProvider) async {
+  void _executeCommand(
+    WidgetData widget,
+    ConnectionProvider connectionProvider,
+  ) async {
     if (widget.type != 'action_button') return;
-    
+
     final command = widget.data['command'] as String?;
     if (command == null || command.isEmpty) return;
 
     try {
       await connectionProvider.sshClient.execute(command);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -39,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             backgroundColor: AppTheme.electricGreen,
           ),
         );
-        
+
         await Future.delayed(const Duration(seconds: 1));
         if (mounted) {
           context.read<DashboardProvider>().fetchDashboard();
@@ -129,35 +132,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
               )
-            : GridView.builder(
-                padding: const EdgeInsets.all(16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: dashboardProvider.plugins.fold<int>(
-                  0,
-                  (sum, plugin) => sum + plugin.widgets.length,
-                ),
-                itemBuilder: (context, index) {
-                  int currentIndex = 0;
-                  for (final plugin in dashboardProvider.plugins) {
-                    for (final widget in plugin.widgets) {
-                      if (currentIndex == index) {
-                        return WidgetFactory.buildWidget(
-                          widget,
-                          onActionExecute: () => _executeCommand(widget, connectionProvider),
-                        );
-                      }
-                      currentIndex++;
-                    }
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
+            : _buildStaggeredGrid(dashboardProvider, connectionProvider),
       ),
+    );
+  }
+
+  Widget _buildStaggeredGrid(DashboardProvider dashboardProvider, ConnectionProvider connectionProvider) {
+    final allWidgets = <WidgetData>[];
+    for (final plugin in dashboardProvider.plugins) {
+      allWidgets.addAll(plugin.widgets);
+    }
+
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final widget = allWidgets[index];
+                if (widget.gridWidth == 2) {
+                  return GridTile(
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        right: index % 2 == 0 ? MediaQuery.of(context).size.width / 2 + 6 : 0,
+                      ),
+                      child: WidgetFactory.buildWidget(
+                        widget,
+                        onActionExecute: () => _executeCommand(widget, connectionProvider),
+                      ),
+                    ),
+                  );
+                }
+                return WidgetFactory.buildWidget(
+                  widget,
+                  onActionExecute: () => _executeCommand(widget, connectionProvider),
+                );
+              },
+              childCount: allWidgets.length,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

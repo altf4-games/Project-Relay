@@ -41,10 +41,11 @@ try:
             {
                 "type": "metric_card",
                 "data": {
-                    "label": "Root Disk",
-                    "value": f"{percent:.1f}% ({used_gb:.1f}GB/{total_gb:.1f}GB)",
+                    "label": "Disk Usage",
+                    "value": f"{percent:.0f}%",
                     "status": status
-                }
+                },
+                "gridWidth": 2
             },
             {
                 "type": "metric_card",

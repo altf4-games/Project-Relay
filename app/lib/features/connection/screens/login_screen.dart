@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _agentPortController.text = config.agentPort.toString();
           _agentSecretController.text = config.agentSecret;
           _labelController.text = config.label ?? '';
-          
+
           if (config.privateKey != null) {
             _authMethod = AuthMethod.key;
             _privateKeyController.text = config.privateKey!;
@@ -54,6 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
             _passwordController.text = config.password!;
           }
         });
+        
+        _autoConnect(config);
       }
     } catch (e) {
       if (mounted) {
@@ -61,6 +63,19 @@ class _LoginScreenState extends State<LoginScreen> {
           SnackBar(content: Text('Failed to load saved config: $e')),
         );
       }
+    }
+  }
+
+  void _autoConnect(ServerConfig config) async {
+    final provider = context.read<ConnectionProvider>();
+    await provider.connect(config);
+
+    if (!mounted) return;
+
+    if (provider.status == ConnectionStatus.connected) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      );
     }
   }
 
@@ -101,9 +116,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await KeyStorage.saveConfig(config);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save config: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to save config: $e')));
       }
     }
 

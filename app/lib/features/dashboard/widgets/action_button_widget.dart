@@ -55,10 +55,16 @@ class _ActionButtonWidgetState extends State<ActionButtonWidget> {
                   width: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.electricGreen),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.electricGreen,
+                    ),
                   ),
                 )
-              : Text(widget.label),
+              : Text(
+                  widget.label,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
         ),
       ),
     );

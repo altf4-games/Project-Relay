@@ -16,7 +16,7 @@ class ProgressBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percentage = (value / max * 100).clamp(0, 100);
-    
+
     Color progressColor;
     if (percentage < 70) {
       progressColor = AppTheme.electricGreen;
@@ -35,10 +35,8 @@ class ProgressBarWidget extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: AppTheme.textGrey,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: AppTheme.textGrey, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(

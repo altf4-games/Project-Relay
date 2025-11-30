@@ -30,16 +30,9 @@ try:
             {
                 "type": "metric_card",
                 "data": {
-                    "label": "Active Containers",
-                    "value": f"{running_containers} / {total_containers}",
+                    "label": "Containers Running",
+                    "value": f"{running_containers}/{total_containers}",
                     "status": status
-                }
-            },
-            {
-                "type": "action_button",
-                "data": {
-                    "label": "Prune System",
-                    "command": "docker system prune -f"
                 }
             }
         ]

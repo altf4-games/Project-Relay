@@ -6,7 +6,10 @@ import '../theme/app_theme.dart';
 import 'models/widget_data.dart';
 
 class WidgetFactory {
-  static Widget buildWidget(WidgetData widgetData, {VoidCallback? onActionExecute}) {
+  static Widget buildWidget(
+    WidgetData widgetData, {
+    VoidCallback? onActionExecute,
+  }) {
     switch (widgetData.type) {
       case 'metric_card':
         return _buildMetricCard(widgetData.data);
@@ -80,7 +83,10 @@ class WidgetFactory {
     );
   }
 
-  static Widget _buildActionButton(Map<String, dynamic> data, VoidCallback? onExecute) {
+  static Widget _buildActionButton(
+    Map<String, dynamic> data,
+    VoidCallback? onExecute,
+  ) {
     return ActionButtonWidget(
       label: data['label'] as String? ?? 'Action',
       command: data['command'] as String? ?? '',
