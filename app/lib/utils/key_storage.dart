@@ -1,13 +1,24 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import '../features/connection/models/server_config.dart';
 
 class KeyStorage {
   static const _storage = FlutterSecureStorage();
   static const _serverConfigKey = 'server_config';
+  static const _hashKey = 'agent_secret_hash';
+
+  static String _hashSecret(String secret) {
+    final bytes = utf8.encode(secret);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
 
   static Future<void> saveConfig(ServerConfig config) async {
     try {
+      final hash = _hashSecret(config.agentSecret);
+      await _storage.write(key: _hashKey, value: hash);
+      
       final jsonString = json.encode(config.toJson());
       await _storage.write(key: _serverConfigKey, value: jsonString);
     } catch (e) {
@@ -41,6 +52,15 @@ class KeyStorage {
       return config != null;
     } catch (e) {
       return false;
+    }
+  }
+
+  static Future<void> clearAll() async {
+    try {
+      await _storage.delete(key: _serverConfigKey);
+      await _storage.delete(key: _hashKey);
+    } catch (e) {
+      throw Exception('Failed to clear storage: ${e.toString()}');
     }
   }
 }

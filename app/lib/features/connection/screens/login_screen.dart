@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/security/biometric_service.dart';
 import '../../../utils/key_storage.dart';
 import '../models/server_config.dart';
 import '../providers/connection_provider.dart';
@@ -32,30 +34,56 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSavedConfig();
+    // Delay to ensure activity is fully initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSavedConfig();
+    });
   }
 
   void _loadSavedConfig() async {
     try {
       final config = await KeyStorage.loadConfig();
       if (config != null && mounted) {
-        setState(() {
-          _hostController.text = config.host;
-          _usernameController.text = config.username;
-          _agentPortController.text = config.agentPort.toString();
-          _agentSecretController.text = config.agentSecret;
-          _labelController.text = config.label ?? '';
-
-          if (config.privateKey != null) {
-            _authMethod = AuthMethod.key;
-            _privateKeyController.text = config.privateKey!;
-          } else if (config.password != null) {
-            _authMethod = AuthMethod.password;
-            _passwordController.text = config.password!;
+        final prefs = await SharedPreferences.getInstance();
+        final biometricEnabled = prefs.getBool('biometric_enabled') ?? false;
+        
+        if (biometricEnabled) {
+          // Small delay to ensure UI is ready
+          await Future.delayed(const Duration(milliseconds: 500));
+          
+          if (!mounted) return;
+          
+          final authenticated = await BiometricService.authenticate();
+          
+          if (!authenticated) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Authentication failed')),
+              );
+            }
+            return;
           }
-        });
+        }
 
-        _autoConnect(config);
+        if (mounted) {
+          setState(() {
+            _hostController.text = config.host;
+            _usernameController.text = config.username;
+            _agentPortController.text = config.agentPort.toString();
+            _agentSecretController.text = config.agentSecret;
+            _labelController.text = config.label ?? '';
+
+            if (config.privateKey != null) {
+              _authMethod = AuthMethod.key;
+              _privateKeyController.text = config.privateKey!;
+            } else if (config.password != null) {
+              _authMethod = AuthMethod.password;
+              _passwordController.text = config.password!;
+            }
+          });
+
+          _autoConnect(config);
+        }
       }
     } catch (e) {
       if (mounted) {

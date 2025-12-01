@@ -91,6 +91,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             tooltip: 'Terminal',
           ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+            tooltip: 'Settings',
+          ),
         ],
       ),
       body: RefreshIndicator(

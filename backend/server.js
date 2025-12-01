@@ -43,6 +43,6 @@ app.get("/api/status", authMiddleware, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "127.0.0.1", () => {
   console.log(`Relay Agent listening on port ${PORT}`);
 });

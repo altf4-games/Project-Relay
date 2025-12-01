@@ -13,10 +13,10 @@ class MetricCard extends StatelessWidget {
     required this.status,
   });
 
-  Color _getStatusColor() {
+  Color _getStatusColor(BuildContext context) {
     switch (status.toLowerCase()) {
       case 'success':
-        return AppTheme.electricGreen;
+        return Theme.of(context).colorScheme.primary;
       case 'warning':
         return AppTheme.warningYellow;
       case 'error':
@@ -28,52 +28,60 @@ class MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppTheme.deepCharcoal.withValues(alpha: 0.5),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppTheme.textGrey,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.surfaceGrey : AppTheme.paperWhite,
+        border: Border.all(
+          color: isDark ? AppTheme.borderGrey : AppTheme.lightBorder,
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: const TextStyle(
+                  color: AppTheme.textGrey,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
                 ),
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(),
-                    shape: BoxShape.circle,
-                  ),
+              ),
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: _getStatusColor(context),
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
-            const Spacer(),
-            Center(
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Center(
               child: Text(
                 value,
                 style: TextStyle(
-                  color: _getStatusColor(),
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                  color: _getStatusColor(context),
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  height: 1.0,
                 ),
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
               ),
             ),
-            const Spacer(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

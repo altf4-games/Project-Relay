@@ -39,29 +39,48 @@ class _ActionButtonWidgetState extends State<ActionButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppTheme.voidBlack.withValues(alpha: 0.5),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.surfaceGrey : AppTheme.paperWhite,
+        border: Border.all(
+          color: isDark ? AppTheme.borderGrey : AppTheme.lightBorder,
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Center(
         child: OutlinedButton(
           onPressed: _isExecuting ? null : _handlePress,
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: AppTheme.electricGreen),
-            foregroundColor: AppTheme.electricGreen,
+            side: BorderSide(
+              color: _isExecuting
+                  ? (isDark ? AppTheme.borderGrey : AppTheme.lightBorder)
+                  : Theme.of(context).colorScheme.primary,
+              width: 1,
+            ),
+            foregroundColor: Theme.of(context).colorScheme.primary,
+            shape: const RoundedRectangleBorder(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           ),
           child: _isExecuting
-              ? const SizedBox(
+              ? SizedBox(
                   height: 16,
                   width: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppTheme.electricGreen,
+                      Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 )
               : Text(
-                  widget.label,
+                  widget.label.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),

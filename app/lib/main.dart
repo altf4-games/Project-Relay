@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/connection/providers/connection_provider.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
+import 'features/settings/providers/settings_provider.dart';
 import 'features/connection/screens/login_screen.dart';
+import 'features/dashboard/screens/dashboard_screen.dart';
+import 'features/settings/screens/settings_screen.dart';
 
 void main() {
   runApp(const RelayApp());
@@ -16,6 +19,9 @@ class RelayApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) => SettingsProvider()..loadSettings(),
+        ),
         ChangeNotifierProvider(create: (_) => ConnectionProvider()),
         ChangeNotifierProxyProvider<ConnectionProvider, DashboardProvider>(
           create: (context) => DashboardProvider(
@@ -26,11 +32,22 @@ class RelayApp extends StatelessWidget {
               DashboardProvider(connectionProvider: connectionProvider),
         ),
       ],
-      child: MaterialApp(
-        title: 'Relay',
-        theme: AppTheme.darkTheme,
-        debugShowCheckedModeBanner: false,
-        home: const LoginScreen(),
+      child: Consumer<SettingsProvider>(
+        builder: (context, settings, _) {
+          return MaterialApp(
+            title: 'Relay',
+            theme: AppTheme.lightTheme(settings.accentColor),
+            darkTheme: AppTheme.darkTheme(settings.accentColor),
+            themeMode: settings.themeMode,
+            debugShowCheckedModeBanner: false,
+            home: const LoginScreen(),
+            routes: {
+              '/login': (context) => const LoginScreen(),
+              '/dashboard': (context) => const DashboardScreen(),
+              '/settings': (context) => const SettingsScreen(),
+            },
+          );
+        },
       ),
     );
   }
