@@ -54,7 +54,7 @@ try {
         data: {
           label: "PM2 Reload All",
           command:
-            "bash -c 'source ~/.bashrc 2>/dev/null; source ~/.profile 2>/dev/null; npx pm2 reload all'",
+            "bash -l -c 'pm2 reload all'",
         },
       },
     ],
