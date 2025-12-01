@@ -53,7 +53,8 @@ try {
         type: "action_button",
         data: {
           label: "PM2 Reload All",
-          command: "pm2 reload all",
+          command:
+            "bash -c 'source ~/.bashrc 2>/dev/null; source ~/.profile 2>/dev/null; npx pm2 reload all'",
         },
       },
     ],

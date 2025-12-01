@@ -159,13 +159,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final cardWidth = (width - 12) / 2;
-          
+
           final List<Widget> rows = [];
           int i = 0;
-          
+
           while (i < allWidgets.length) {
             final widget = allWidgets[i];
-            
+
             if (widget.gridWidth == 2) {
               rows.add(
                 SizedBox(
@@ -173,17 +173,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   height: 140,
                   child: WidgetFactory.buildWidget(
                     widget,
-                    onActionExecute: () => _executeCommand(widget, connectionProvider),
+                    onActionExecute: () =>
+                        _executeCommand(widget, connectionProvider),
                   ),
                 ),
               );
               i++;
             } else {
               final leftWidget = widget;
-              final rightWidget = (i + 1 < allWidgets.length && allWidgets[i + 1].gridWidth != 2)
+              final rightWidget =
+                  (i + 1 < allWidgets.length &&
+                      allWidgets[i + 1].gridWidth != 2)
                   ? allWidgets[i + 1]
                   : null;
-              
+
               rows.add(
                 Row(
                   children: [
@@ -192,7 +195,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: 140,
                       child: WidgetFactory.buildWidget(
                         leftWidget,
-                        onActionExecute: () => _executeCommand(leftWidget, connectionProvider),
+                        onActionExecute: () =>
+                            _executeCommand(leftWidget, connectionProvider),
                       ),
                     ),
                     if (rightWidget != null) ...[
@@ -202,25 +206,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         height: 140,
                         child: WidgetFactory.buildWidget(
                           rightWidget,
-                          onActionExecute: () => _executeCommand(rightWidget, connectionProvider),
+                          onActionExecute: () =>
+                              _executeCommand(rightWidget, connectionProvider),
                         ),
                       ),
                     ],
                   ],
                 ),
               );
-              
+
               i += rightWidget != null ? 2 : 1;
             }
-            
+
             if (i < allWidgets.length) {
               rows.add(const SizedBox(height: 12));
             }
           }
-          
-          return Column(
-            children: rows,
-          );
+
+          return Column(children: rows);
         },
       ),
     );

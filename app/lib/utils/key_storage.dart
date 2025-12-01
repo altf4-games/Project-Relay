@@ -18,7 +18,7 @@ class KeyStorage {
     try {
       final hash = _hashSecret(config.agentSecret);
       await _storage.write(key: _hashKey, value: hash);
-      
+
       final jsonString = json.encode(config.toJson());
       await _storage.write(key: _serverConfigKey, value: jsonString);
     } catch (e) {

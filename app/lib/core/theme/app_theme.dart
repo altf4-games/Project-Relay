@@ -12,7 +12,7 @@ class AppTheme {
   static const Color textGrey = Color(0xFF888888);
   static const Color warningYellow = Color(0xFFFFAB00);
   static const Color errorRed = Color(0xFFFF5630);
-  
+
   static const Color offWhite = Color(0xFFF5F5F7);
   static const Color paperWhite = Color(0xFFFFFFFF);
   static const Color lightBorder = Color(0xFFE1E1E1);
@@ -47,7 +47,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: deepCharcoal,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: borderGrey, width: 1),
@@ -112,7 +115,7 @@ class AppTheme {
     } else {
       accent = deepNavy;
     }
-    
+
     return ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: offWhite,
@@ -139,7 +142,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: paperWhite,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: lightBorder, width: 1),

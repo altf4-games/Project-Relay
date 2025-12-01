@@ -46,15 +46,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (config != null && mounted) {
         final prefs = await SharedPreferences.getInstance();
         final biometricEnabled = prefs.getBool('biometric_enabled') ?? false;
-        
+
         if (biometricEnabled) {
           // Small delay to ensure UI is ready
           await Future.delayed(const Duration(milliseconds: 500));
-          
+
           if (!mounted) return;
-          
+
           final authenticated = await BiometricService.authenticate();
-          
+
           if (!authenticated) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(

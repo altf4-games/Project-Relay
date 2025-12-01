@@ -24,8 +24,8 @@ class BiometricService {
       );
     } on PlatformException catch (e) {
       // Handle specific error cases
-      if (e.code == 'NotAvailable' || 
-          e.code == 'NotEnrolled' || 
+      if (e.code == 'NotAvailable' ||
+          e.code == 'NotEnrolled' ||
           e.code == 'LockedOut' ||
           e.code == 'PermanentlyLockedOut' ||
           e.message?.contains('activity') == true) {

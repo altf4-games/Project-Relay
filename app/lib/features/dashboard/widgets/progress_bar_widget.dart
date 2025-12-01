@@ -61,10 +61,7 @@ class ProgressBarWidget extends StatelessWidget {
               ),
               Text(
                 '${value.toStringAsFixed(1)} / ${max.toStringAsFixed(1)}',
-                style: const TextStyle(
-                  color: AppTheme.textGrey,
-                  fontSize: 11,
-                ),
+                style: const TextStyle(color: AppTheme.textGrey, fontSize: 11),
               ),
             ],
           ),
@@ -78,9 +75,7 @@ class ProgressBarWidget extends StatelessWidget {
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: value / max,
-              child: Container(
-                color: _getBarColor(context),
-              ),
+              child: Container(color: _getBarColor(context)),
             ),
           ),
         ],

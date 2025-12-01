@@ -10,16 +10,14 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsProvider>(context);
-    
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SETTINGS'),
-      ),
+      appBar: AppBar(title: const Text('SETTINGS')),
       body: FutureBuilder(
         future: KeyStorage.loadConfig(),
         builder: (context, snapshot) {
           final config = snapshot.data;
-          
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -27,8 +25,14 @@ class SettingsScreen extends StatelessWidget {
                 title: 'CONNECTION',
                 children: [
                   _buildInfoTile('Host', config?.host ?? 'Not configured'),
-                  _buildInfoTile('Port', config?.agentPort.toString() ?? 'Not configured'),
-                  _buildInfoTile('Username', config?.username ?? 'Not configured'),
+                  _buildInfoTile(
+                    'Port',
+                    config?.agentPort.toString() ?? 'Not configured',
+                  ),
+                  _buildInfoTile(
+                    'Username',
+                    config?.username ?? 'Not configured',
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -42,9 +46,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildSection(
                 title: 'SECURITY',
-                children: [
-                  _buildBiometricToggle(settings),
-                ],
+                children: [_buildBiometricToggle(settings)],
               ),
               const SizedBox(height: 24),
               _buildDisconnectButton(context),
@@ -112,10 +114,7 @@ class SettingsScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  color: AppTheme.textGrey,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: AppTheme.textGrey, fontSize: 12),
               ),
               Text(
                 value,
@@ -149,10 +148,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           const Text(
             'Theme',
-            style: TextStyle(
-              color: AppTheme.textGrey,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: AppTheme.textGrey, fontSize: 12),
           ),
           Container(
             decoration: BoxDecoration(
@@ -165,7 +161,9 @@ class SettingsScreen extends StatelessWidget {
               value: settings.themeMode,
               underline: const SizedBox(),
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              dropdownColor: isDark ? AppTheme.surfaceGrey : AppTheme.paperWhite,
+              dropdownColor: isDark
+                  ? AppTheme.surfaceGrey
+                  : AppTheme.paperWhite,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
                 fontSize: 12,
@@ -176,14 +174,8 @@ class SettingsScreen extends StatelessWidget {
                   value: ThemeMode.system,
                   child: Text('SYSTEM'),
                 ),
-                DropdownMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text('DARK'),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.light,
-                  child: Text('LIGHT'),
-                ),
+                DropdownMenuItem(value: ThemeMode.dark, child: Text('DARK')),
+                DropdownMenuItem(value: ThemeMode.light, child: Text('LIGHT')),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -197,7 +189,10 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAccentColorTile(BuildContext context, SettingsProvider settings) {
+  Widget _buildAccentColorTile(
+    BuildContext context,
+    SettingsProvider settings,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = [
       AppTheme.electricGreen,
@@ -222,10 +217,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           const Text(
             'Accent Color',
-            style: TextStyle(
-              color: AppTheme.textGrey,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: AppTheme.textGrey, fontSize: 12),
           ),
           Row(
             children: colors.map((color) {
@@ -241,7 +233,9 @@ class SettingsScreen extends StatelessWidget {
                     border: Border.all(
                       color: isSelected
                           ? (isDark ? Colors.white : Colors.black)
-                          : (isDark ? AppTheme.borderGrey : AppTheme.lightBorder),
+                          : (isDark
+                                ? AppTheme.borderGrey
+                                : AppTheme.lightBorder),
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -273,18 +267,19 @@ class SettingsScreen extends StatelessWidget {
             children: [
               const Text(
                 'Biometric Authentication',
-                style: TextStyle(
-                  color: AppTheme.textGrey,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: AppTheme.textGrey, fontSize: 12),
               ),
               Switch(
                 value: settings.isBiometricEnabled,
                 onChanged: (value) => settings.toggleBiometrics(value),
                 activeColor: Theme.of(context).colorScheme.primary,
-                activeTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                activeTrackColor: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.5),
                 inactiveThumbColor: AppTheme.textGrey,
-                inactiveTrackColor: isDark ? AppTheme.borderGrey : AppTheme.lightBorder,
+                inactiveTrackColor: isDark
+                    ? AppTheme.borderGrey
+                    : AppTheme.lightBorder,
               ),
             ],
           ),
@@ -309,11 +304,15 @@ class SettingsScreen extends StatelessWidget {
               builder: (context) {
                 final isDark = Theme.of(context).brightness == Brightness.dark;
                 return AlertDialog(
-                  backgroundColor: isDark ? AppTheme.surfaceGrey : AppTheme.paperWhite,
+                  backgroundColor: isDark
+                      ? AppTheme.surfaceGrey
+                      : AppTheme.paperWhite,
                   shape: const RoundedRectangleBorder(),
                   title: Text(
                     'DISCONNECT',
-                    style: TextStyle(color: isDark ? Colors.white : AppTheme.deepNavy),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : AppTheme.deepNavy,
+                    ),
                   ),
                   content: const Text(
                     'Are you sure you want to disconnect? All saved credentials will be removed.',
@@ -323,7 +322,10 @@ class SettingsScreen extends StatelessWidget {
                     OutlinedButton(
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppTheme.borderGrey, width: 1),
+                        side: const BorderSide(
+                          color: AppTheme.borderGrey,
+                          width: 1,
+                        ),
                         shape: const RoundedRectangleBorder(),
                       ),
                       child: const Text('CANCEL'),
@@ -331,7 +333,10 @@ class SettingsScreen extends StatelessWidget {
                     OutlinedButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppTheme.errorRed, width: 1),
+                        side: const BorderSide(
+                          color: AppTheme.errorRed,
+                          width: 1,
+                        ),
                         foregroundColor: AppTheme.errorRed,
                         shape: const RoundedRectangleBorder(),
                       ),
@@ -345,10 +350,9 @@ class SettingsScreen extends StatelessWidget {
             if (confirm == true && context.mounted) {
               await KeyStorage.deleteConfig();
               if (context.mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/login', (route) => false);
               }
             }
           },

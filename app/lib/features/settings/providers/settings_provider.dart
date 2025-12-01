@@ -16,15 +16,15 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     final themeModeIndex = prefs.getInt(_themeModeKey) ?? 2;
     _themeMode = ThemeMode.values[themeModeIndex];
-    
+
     final colorValue = prefs.getInt(_accentColorKey) ?? 0xFF00FF94;
     _accentColor = Color(colorValue);
-    
+
     _isBiometricEnabled = prefs.getBool(_biometricKey) ?? false;
-    
+
     notifyListeners();
   }
 
