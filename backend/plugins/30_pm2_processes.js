@@ -49,14 +49,6 @@ try {
           status: restartStatus,
         },
       },
-      {
-        type: "action_button",
-        data: {
-          label: "PM2 Reload All",
-          command:
-            "bash -l -c 'pm2 reload all'",
-        },
-      },
     ],
   };
 
