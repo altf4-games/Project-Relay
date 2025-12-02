@@ -898,13 +898,75 @@ Before deploying your plugin:
 
 See these examples in the `plugins/` directory:
 
-1. **00_system_vitals.py** - CPU, RAM, uptime (Python + psutil)
-2. **10_disk_usage.py** - Disk space monitoring (Python + psutil)
-3. **20_docker_containers.py** - Docker status (Python + subprocess)
-4. **30_pm2_processes.js** - PM2 process manager (Node.js + execSync)
-5. **40_network_traffic.py** - Network I/O stats (Python + psutil)
+1. **00_system_vitals.py** - CPU, RAM, uptime with historical sparkline graphs (Python + psutil)
+   - Uses `metric_chart` type for CPU and RAM to show trends
+   - Backend automatically collects metrics every second
+   - Last 60 data points displayed as smooth line graphs
+2. **20_docker_containers.py** - Docker status (Python + subprocess)
+3. **30_pm2_processes.js** - PM2 process manager (Node.js + execSync)
+4. **40_network_traffic.py** - Network I/O stats (Python + psutil)
 
 Each plugin demonstrates best practices for that type of monitoring.
+
+## New Features: Historical Data & Graphs
+
+### Sparkline Charts (metric_chart)
+
+The agent now supports historical data visualization with sparkline charts. This gives users true observability - seeing trends, not just current values.
+
+**How It Works:**
+
+1. **Backend Metrics Collection**: The agent runs `metricsCollector.js` which collects CPU and memory metrics every second using Python/psutil
+2. **Rolling Window**: Keeps the last 60 data points in memory
+3. **API Response**: Includes `history` object with arrays of historical values
+4. **Frontend Rendering**: Uses `fl_chart` package to render smooth line graphs
+
+**Using metric_chart in Your Plugin:**
+
+```python
+{
+    "type": "metric_chart",
+    "data": {
+        "label": "CPU Load",
+        "value": f"{cpu_percent:.1f}%",
+        "status": cpu_status,
+        "metricType": "cpu"  # Maps to history.cpu array
+    }
+}
+```
+
+**Supported metricType values:**
+- `"cpu"` - CPU percentage history
+- `"memory"` - Memory percentage history
+- Custom types (requires backend modification)
+
+**When to Use:**
+- ✅ Use `metric_chart` for metrics that change over time (CPU, RAM, network)
+- ❌ Use `metric_card` for static values (uptime, version, status)
+
+## Dashboard Customization
+
+### Widget Reordering
+
+Users can customize their dashboard layout by dragging and dropping widgets:
+
+**User Experience:**
+1. Long-press any widget card
+2. Drag to desired position in the 2-column grid
+3. Release to drop
+4. Order is automatically saved to device storage
+5. Persists across app restarts
+
+**Implementation Details:**
+- Uses `reorderable_grid_view` package
+- Widget IDs: `type + label + index`
+- Saved to `SharedPreferences` as string list
+- Applied on dashboard load
+
+**Plugin Considerations:**
+- Widgets maintain their `gridWidth` during reordering
+- Full-width widgets (`gridWidth: 2`) can be moved independently
+- Order applies to all widgets across all plugins combined
 
 ## Getting Help
 

@@ -78,17 +78,18 @@ openssl rand -base64 32
 Check that default plugins are executable:
 
 ```bash
-chmod +x plugins/*.py plugins/*.sh
+chmod +x plugins/*.py plugins/*.sh plugins/*.js
 ls -la plugins/
 ```
 
 You should see:
 
-- `00_system_vitals.py`
-- `10_disk_usage.py`
-- `20_docker_containers.py`
-- `30_pm2_processes.js`
-- `40_network_traffic.py`
+- `00_system_vitals.py` - CPU, RAM, uptime with historical graphs
+- `20_docker_containers.py` - Docker container status
+- `30_pm2_processes.js` - PM2 process monitoring
+- `40_network_traffic.py` - Network I/O statistics
+
+**Note:** The agent automatically collects CPU and memory metrics every second for historical graphing. This data is kept in memory (last 60 data points) and served with the API response.
 
 ### 7. Test the Agent Manually
 

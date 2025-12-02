@@ -96,19 +96,23 @@ class DashboardProvider extends ChangeNotifier {
       _plugins = (dataList as List<dynamic>)
           .map((item) => PluginData.fromJson(item as Map<String, dynamic>))
           .toList();
-      
+
       final historyData = jsonData['history'];
       if (historyData != null && historyData is Map) {
         _metricsHistory = {
-          'cpu': (historyData['cpu'] as List<dynamic>?)
-              ?.map((e) => (e as num).toDouble())
-              .toList() ?? [],
-          'memory': (historyData['memory'] as List<dynamic>?)
-              ?.map((e) => (e as num).toDouble())
-              .toList() ?? [],
+          'cpu':
+              (historyData['cpu'] as List<dynamic>?)
+                  ?.map((e) => (e as num).toDouble())
+                  .toList() ??
+              [],
+          'memory':
+              (historyData['memory'] as List<dynamic>?)
+                  ?.map((e) => (e as num).toDouble())
+                  .toList() ??
+              [],
         };
       }
-      
+
       _errorMessage = null;
     } catch (e) {
       _errorMessage = 'Failed to fetch data: ${e.toString()}';

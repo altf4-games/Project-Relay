@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/sdui/widget_factory.dart';
@@ -149,86 +150,89 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ConnectionProvider connectionProvider,
   ) {
     final allWidgets = <WidgetData>[];
+    
     for (final plugin in dashboardProvider.plugins) {
       allWidgets.addAll(plugin.widgets);
     }
+    
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final cardWidth = (width - 12) / 2;
 
-          final List<Widget> rows = [];
-          int i = 0;
-
-          while (i < allWidgets.length) {
-            final widget = allWidgets[i];
-
-            if (widget.gridWidth == 2) {
-              rows.add(
-                SizedBox(
-                  width: width,
-                  height: 140,
-                  child: WidgetFactory.buildWidget(
-                    widget,
-                    onActionExecute: () =>
-                        _executeCommand(widget, connectionProvider),
-                    metricsHistory: dashboardProvider.metricsHistory,
-                  ),
-                ),
-              );
-              i++;
-            } else {
-              final leftWidget = widget;
-              final rightWidget =
-                  (i + 1 < allWidgets.length &&
-                      allWidgets[i + 1].gridWidth != 2)
-                  ? allWidgets[i + 1]
-                  : null;
-
-              rows.add(
-                Row(
-                  children: [
-                    SizedBox(
-                      width: cardWidth,
-                      height: 140,
-                      child: WidgetFactory.buildWidget(
-                        leftWidget,
-                        onActionExecute: () =>
-                            _executeCommand(leftWidget, connectionProvider),
-                        metricsHistory: dashboardProvider.metricsHistory,
-                      ),
+    // Build layout items - pair 1-width widgets, keep 2-width solo
+    final List<Widget> layoutItems = [];
+    
+    int i = 0;
+    while (i < allWidgets.length) {
+      final widget = allWidgets[i];
+      
+      if (widget.gridWidth == 2) {
+        // Full-width widget
+        layoutItems.add(
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            height: 140,
+            child: WidgetFactory.buildWidget(
+              widget,
+              onActionExecute: () => _executeCommand(widget, connectionProvider),
+              metricsHistory: dashboardProvider.metricsHistory,
+            ),
+          ),
+        );
+        i++;
+      } else {
+        // Check if next widget is also 1-width
+        final nextWidget = (i + 1 < allWidgets.length && allWidgets[i + 1].gridWidth != 2)
+            ? allWidgets[i + 1]
+            : null;
+        
+        if (nextWidget != null) {
+          // Pair two 1-width widgets
+          layoutItems.add(
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              height: 140,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: WidgetFactory.buildWidget(
+                      widget,
+                      onActionExecute: () => _executeCommand(widget, connectionProvider),
+                      metricsHistory: dashboardProvider.metricsHistory,
                     ),
-                    if (rightWidget != null) ...[
-                      const SizedBox(width: 12),
-                      SizedBox(
-                        width: cardWidth,
-                        height: 140,
-                        child: WidgetFactory.buildWidget(
-                          rightWidget,
-                          onActionExecute: () =>
-                              _executeCommand(rightWidget, connectionProvider),
-                          metricsHistory: dashboardProvider.metricsHistory,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              );
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: WidgetFactory.buildWidget(
+                      nextWidget,
+                      onActionExecute: () => _executeCommand(nextWidget, connectionProvider),
+                      metricsHistory: dashboardProvider.metricsHistory,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+          i += 2;
+        } else {
+          // Single 1-width widget - make it full width
+          layoutItems.add(
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              height: 140,
+              child: WidgetFactory.buildWidget(
+                widget,
+                onActionExecute: () => _executeCommand(widget, connectionProvider),
+                metricsHistory: dashboardProvider.metricsHistory,
+              ),
+            ),
+          );
+          i++;
+        }
+      }
+    }
 
-              i += rightWidget != null ? 2 : 1;
-            }
-
-            if (i < allWidgets.length) {
-              rows.add(const SizedBox(height: 12));
-            }
-          }
-
-          return Column(children: rows);
-        },
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: layoutItems,
     );
   }
 }

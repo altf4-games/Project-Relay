@@ -18,7 +18,7 @@ class MetricChart extends StatelessWidget {
 
   Color _getStatusColor(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     switch (status) {
       case 'success':
         return Theme.of(context).colorScheme.primary;
@@ -48,7 +48,9 @@ class MetricChart extends StatelessWidget {
     final borderColor = _getBorderColor(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : Colors.black;
-    final labelColor = isDark ? const Color(0xFF888888) : const Color(0xFF64748B);
+    final labelColor = isDark
+        ? const Color(0xFF888888)
+        : const Color(0xFF64748B);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -86,15 +88,23 @@ class MetricChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: textColor,
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           if (history.isNotEmpty)
             SizedBox(
               height: 40,

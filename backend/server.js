@@ -34,9 +34,11 @@ const authMiddleware = (req, res, next) => {
 app.get("/api/status", authMiddleware, async (req, res) => {
   try {
     const pluginResults = await runPlugins();
-    const { getMetricsHistory } = await import("./src/services/metricsCollector.js");
+    const { getMetricsHistory } = await import(
+      "./src/services/metricsCollector.js"
+    );
     const history = getMetricsHistory();
-    
+
     res.json({
       status: "alive",
       data: pluginResults,

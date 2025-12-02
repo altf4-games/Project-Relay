@@ -53,11 +53,11 @@ class WidgetFactory {
   ) {
     final metricType = data['metricType'] as String?;
     List<double> history = [];
-    
+
     if (metricsHistory != null && metricType != null) {
       history = metricsHistory[metricType] ?? [];
     }
-    
+
     return MetricChart(
       label: data['label'] as String? ?? 'N/A',
       value: data['value'] as String? ?? '0',

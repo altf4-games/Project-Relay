@@ -12,15 +12,17 @@ const metricsHistory = {
 
 async function collectCurrentMetrics() {
   try {
-    const { stdout } = await execAsync("python3 -c \"import psutil; import json; print(json.dumps({'cpu': psutil.cpu_percent(interval=0.5), 'memory': psutil.virtual_memory().percent}))\"");
+    const { stdout } = await execAsync(
+      "python3 -c \"import psutil; import json; print(json.dumps({'cpu': psutil.cpu_percent(interval=0.5), 'memory': psutil.virtual_memory().percent}))\""
+    );
     const metrics = JSON.parse(stdout.trim());
-    
+
     const timestamp = Date.now();
-    
+
     metricsHistory.cpu.push(metrics.cpu);
     metricsHistory.memory.push(metrics.memory);
     metricsHistory.timestamps.push(timestamp);
-    
+
     if (metricsHistory.cpu.length > MAX_HISTORY) {
       metricsHistory.cpu.shift();
       metricsHistory.memory.shift();

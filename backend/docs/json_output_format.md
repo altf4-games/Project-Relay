@@ -40,7 +40,7 @@ Every Relay plugin must output a single JSON object to stdout. This document det
 
 ### 1. metric_card
 
-Displays a single labeled metric with a status indicator.
+Displays a single labeled metric with a status indicator (no historical graph).
 
 **JSON Structure:**
 
@@ -67,11 +67,9 @@ Displays a single labeled metric with a status indicator.
 
 **Example Use Cases:**
 
-- CPU load percentage
-- Memory usage
-- Disk space remaining
+- Uptime
 - Service status (running/stopped)
-- Response time
+- Static metrics without trends
 
 **Visual Rendering:**
 
@@ -82,7 +80,69 @@ Displays a single labeled metric with a status indicator.
 └──────────────────────┘
 ```
 
-### 2. progress_bar
+### 2. metric_chart
+
+Displays a labeled metric with a status indicator AND a sparkline graph showing historical trend.
+
+**JSON Structure:**
+
+```json
+{
+  "type": "metric_chart",
+  "data": {
+    "label": "CPU Load",
+    "value": "45%",
+    "status": "success",
+    "metricType": "cpu"
+  }
+}
+```
+
+**Fields:**
+
+- `type`: Must be `"metric_chart"`
+- `data.label` (string, required): Metric name
+- `data.value` (string, required): Current metric value
+- `data.status` (string, required): Status indicator (success/warning/error)
+- `data.metricType` (string, required): Type identifier for history lookup
+  - `"cpu"` - Maps to CPU history from backend
+  - `"memory"` - Maps to memory history from backend
+  - Other custom types if backend provides them
+
+**Backend Requirements:**
+
+The backend must provide historical data in the API response:
+
+```json
+{
+  "status": "alive",
+  "data": [...],
+  "history": {
+    "cpu": [12.5, 15.2, 18.1, ..., 45.0],
+    "memory": [25.0, 26.5, 28.0, ..., 42.3]
+  }
+}
+```
+
+**Example Use Cases:**
+
+- CPU load percentage with trend
+- Memory usage with trend
+- Network throughput over time
+- Any metric where seeing the trend is valuable
+
+**Visual Rendering:**
+
+```
+┌──────────────────────┐
+│ ● CPU Load           │
+│   45%                │
+│   ╱╲  ╱╲             │
+│  ╱  ╲╱  ╲╱╲          │
+└──────────────────────┘
+```
+
+### 3. progress_bar
 
 Displays a progress bar with percentage or value/max.
 
@@ -132,7 +192,7 @@ Displays a progress bar with percentage or value/max.
 └────────────────────────────────────┘
 ```
 
-### 3. action_button
+### 3. progress_bar
 
 Displays a button that executes an SSH command when pressed.
 
@@ -176,9 +236,22 @@ Displays a button that executes an SSH command when pressed.
 └──────────────────────┘
 ```
 
-## Grid Layout System
+## Widget Reordering (Drag & Drop)
 
-Widgets are arranged in a 2-column grid. Control widget width with `gridWidth`:
+The Relay app supports drag-and-drop reordering of widgets on the dashboard. Users can long-press and drag any widget to rearrange them. The order is persisted to device storage and restored on app restart.
+
+**Implementation:**
+- Uses `ReorderableGridView` for 2-column layout
+- Widget order saved to `SharedPreferences`
+- Each widget identified by `type + label + index`
+
+**User Experience:**
+- Long-press any widget to enter drag mode
+- Drag to desired position
+- Release to drop
+- Order automatically saved
+
+## Grid Layout System
 
 **gridWidth: 1** (default)
 

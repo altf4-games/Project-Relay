@@ -8,7 +8,7 @@ class SettingsProvider extends ChangeNotifier {
 
   ThemeMode _themeMode = ThemeMode.dark;
   Color _accentColor = const Color(0xFF00FF94);
-  bool _isBiometricEnabled = false; // Disabled by default
+  bool _isBiometricEnabled = true; // Enabled by default
 
   ThemeMode get themeMode => _themeMode;
   Color get accentColor => _accentColor;
@@ -23,7 +23,7 @@ class SettingsProvider extends ChangeNotifier {
     final colorValue = prefs.getInt(_accentColorKey) ?? 0xFF00FF94;
     _accentColor = Color(colorValue);
 
-    _isBiometricEnabled = prefs.getBool(_biometricKey) ?? false;
+    _isBiometricEnabled = prefs.getBool(_biometricKey) ?? true;
 
     notifyListeners();
   }
