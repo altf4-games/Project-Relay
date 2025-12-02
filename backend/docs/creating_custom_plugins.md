@@ -936,11 +936,13 @@ The agent now supports historical data visualization with sparkline charts. This
 ```
 
 **Supported metricType values:**
+
 - `"cpu"` - CPU percentage history
 - `"memory"` - Memory percentage history
 - Custom types (requires backend modification)
 
 **When to Use:**
+
 - ✅ Use `metric_chart` for metrics that change over time (CPU, RAM, network)
 - ❌ Use `metric_card` for static values (uptime, version, status)
 
@@ -951,6 +953,7 @@ The agent now supports historical data visualization with sparkline charts. This
 Users can customize their dashboard layout by dragging and dropping widgets:
 
 **User Experience:**
+
 1. Long-press any widget card
 2. Drag to desired position in the 2-column grid
 3. Release to drop
@@ -958,12 +961,14 @@ Users can customize their dashboard layout by dragging and dropping widgets:
 5. Persists across app restarts
 
 **Implementation Details:**
+
 - Uses `reorderable_grid_view` package
 - Widget IDs: `type + label + index`
 - Saved to `SharedPreferences` as string list
 - Applied on dashboard load
 
 **Plugin Considerations:**
+
 - Widgets maintain their `gridWidth` during reordering
 - Full-width widgets (`gridWidth: 2`) can be moved independently
 - Order applies to all widgets across all plugins combined

@@ -150,20 +150,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ConnectionProvider connectionProvider,
   ) {
     final allWidgets = <WidgetData>[];
-    
+
     for (final plugin in dashboardProvider.plugins) {
       allWidgets.addAll(plugin.widgets);
     }
-    
-
 
     // Build layout items - pair 1-width widgets, keep 2-width solo
     final List<Widget> layoutItems = [];
-    
+
     int i = 0;
     while (i < allWidgets.length) {
       final widget = allWidgets[i];
-      
+
       if (widget.gridWidth == 2) {
         // Full-width widget
         layoutItems.add(
@@ -172,7 +170,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             height: 140,
             child: WidgetFactory.buildWidget(
               widget,
-              onActionExecute: () => _executeCommand(widget, connectionProvider),
+              onActionExecute: () =>
+                  _executeCommand(widget, connectionProvider),
               metricsHistory: dashboardProvider.metricsHistory,
             ),
           ),
@@ -180,10 +179,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         i++;
       } else {
         // Check if next widget is also 1-width
-        final nextWidget = (i + 1 < allWidgets.length && allWidgets[i + 1].gridWidth != 2)
+        final nextWidget =
+            (i + 1 < allWidgets.length && allWidgets[i + 1].gridWidth != 2)
             ? allWidgets[i + 1]
             : null;
-        
+
         if (nextWidget != null) {
           // Pair two 1-width widgets
           layoutItems.add(
@@ -195,7 +195,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: WidgetFactory.buildWidget(
                       widget,
-                      onActionExecute: () => _executeCommand(widget, connectionProvider),
+                      onActionExecute: () =>
+                          _executeCommand(widget, connectionProvider),
                       metricsHistory: dashboardProvider.metricsHistory,
                     ),
                   ),
@@ -203,7 +204,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: WidgetFactory.buildWidget(
                       nextWidget,
-                      onActionExecute: () => _executeCommand(nextWidget, connectionProvider),
+                      onActionExecute: () =>
+                          _executeCommand(nextWidget, connectionProvider),
                       metricsHistory: dashboardProvider.metricsHistory,
                     ),
                   ),
@@ -220,7 +222,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               height: 140,
               child: WidgetFactory.buildWidget(
                 widget,
-                onActionExecute: () => _executeCommand(widget, connectionProvider),
+                onActionExecute: () =>
+                    _executeCommand(widget, connectionProvider),
                 metricsHistory: dashboardProvider.metricsHistory,
               ),
             ),
@@ -230,9 +233,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     }
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: layoutItems,
-    );
+    return ListView(padding: const EdgeInsets.all(16), children: layoutItems);
   }
 }

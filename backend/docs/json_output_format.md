@@ -241,11 +241,13 @@ Displays a button that executes an SSH command when pressed.
 The Relay app supports drag-and-drop reordering of widgets on the dashboard. Users can long-press and drag any widget to rearrange them. The order is persisted to device storage and restored on app restart.
 
 **Implementation:**
+
 - Uses `ReorderableGridView` for 2-column layout
 - Widget order saved to `SharedPreferences`
 - Each widget identified by `type + label + index`
 
 **User Experience:**
+
 - Long-press any widget to enter drag mode
 - Drag to desired position
 - Release to drop

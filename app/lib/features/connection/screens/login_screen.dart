@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final config = await KeyStorage.loadConfig();
       if (config != null && mounted) {
         final prefs = await SharedPreferences.getInstance();
-        final biometricEnabled = prefs.getBool('biometric_enabled') ?? false;
+        final biometricEnabled = prefs.getBool('biometric_enabled') ?? true;
 
         if (biometricEnabled) {
           // Small delay to ensure UI is ready
