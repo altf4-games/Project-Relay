@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../features/dashboard/widgets/metric_card.dart';
+import '../../features/dashboard/widgets/metric_chart.dart';
 import '../../features/dashboard/widgets/progress_bar_widget.dart';
 import '../../features/dashboard/widgets/action_button_widget.dart';
 import '../theme/app_theme.dart';
@@ -9,10 +10,13 @@ class WidgetFactory {
   static Widget buildWidget(
     WidgetData widgetData, {
     VoidCallback? onActionExecute,
+    Map<String, List<double>>? metricsHistory,
   }) {
     switch (widgetData.type) {
       case 'metric_card':
         return _buildMetricCard(widgetData.data);
+      case 'metric_chart':
+        return _buildMetricChart(widgetData.data, metricsHistory);
       case 'progress_bar':
         return _buildProgressBar(widgetData.data);
       case 'log_stream':
@@ -40,6 +44,25 @@ class WidgetFactory {
       label: data['label'] as String? ?? 'N/A',
       value: data['value'] as String? ?? '0',
       status: data['status'] as String? ?? 'unknown',
+    );
+  }
+
+  static Widget _buildMetricChart(
+    Map<String, dynamic> data,
+    Map<String, List<double>>? metricsHistory,
+  ) {
+    final metricType = data['metricType'] as String?;
+    List<double> history = [];
+    
+    if (metricsHistory != null && metricType != null) {
+      history = metricsHistory[metricType] ?? [];
+    }
+    
+    return MetricChart(
+      label: data['label'] as String? ?? 'N/A',
+      value: data['value'] as String? ?? '0',
+      status: data['status'] as String? ?? 'unknown',
+      history: history,
     );
   }
 

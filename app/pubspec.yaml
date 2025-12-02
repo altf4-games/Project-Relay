@@ -53,6 +53,12 @@ dependencies:
   crypto: ^3.0.7
   shared_preferences: ^2.5.3
 
+  # Charts
+  fl_chart: ^0.69.0
+
+  # Reorderable Grid
+  reorderable_grid_view: ^2.2.8
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -109,6 +115,7 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon.png"
+  image_path: "assets/lightning_logo.png"
   adaptive_icon_background: "#121212"
-  adaptive_icon_foreground: "assets/icon_foreground.png"
+  adaptive_icon_foreground: "assets/lightning_logo.png"
+  remove_alpha_ios: true

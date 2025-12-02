@@ -3,6 +3,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { runPlugins } from "./src/services/pluginRunner.js";
+import { collectMetrics } from "./src/services/metricsCollector.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +16,8 @@ if (!AGENT_SECRET) {
   console.error("ERROR: AGENT_SECRET environment variable is required");
   process.exit(1);
 }
+
+collectMetrics();
 
 app.use(express.json());
 
@@ -31,9 +34,13 @@ const authMiddleware = (req, res, next) => {
 app.get("/api/status", authMiddleware, async (req, res) => {
   try {
     const pluginResults = await runPlugins();
+    const { getMetricsHistory } = await import("./src/services/metricsCollector.js");
+    const history = getMetricsHistory();
+    
     res.json({
       status: "alive",
       data: pluginResults,
+      history: history,
     });
   } catch (error) {
     res.status(500).json({

@@ -27,19 +27,21 @@ try:
         "title": "System Vitals",
         "widgets": [
             {
-                "type": "metric_card",
+                "type": "metric_chart",
                 "data": {
                     "label": "CPU Load",
                     "value": f"{cpu_percent:.1f}%",
-                    "status": cpu_status
+                    "status": cpu_status,
+                    "metricType": "cpu"
                 }
             },
             {
-                "type": "metric_card",
+                "type": "metric_chart",
                 "data": {
                     "label": "RAM Usage",
                     "value": memory_str,
-                    "status": memory_status
+                    "status": memory_status,
+                    "metricType": "memory"
                 }
             },
             {

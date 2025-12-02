@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/sdui/models/widget_data.dart';
 import '../../../features/connection/providers/connection_provider.dart';
 
@@ -7,14 +8,33 @@ class DashboardProvider extends ChangeNotifier {
   final ConnectionProvider connectionProvider;
 
   List<PluginData> _plugins = [];
+  Map<String, List<double>> _metricsHistory = {};
+  List<String> _widgetOrder = [];
   bool _isLoading = false;
   String? _errorMessage;
 
-  DashboardProvider({required this.connectionProvider});
+  DashboardProvider({required this.connectionProvider}) {
+    _loadWidgetOrder();
+  }
 
   List<PluginData> get plugins => _plugins;
+  Map<String, List<double>> get metricsHistory => _metricsHistory;
+  List<String> get widgetOrder => _widgetOrder;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+
+  Future<void> _loadWidgetOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    _widgetOrder = prefs.getStringList('widget_order') ?? [];
+    notifyListeners();
+  }
+
+  Future<void> saveWidgetOrder(List<String> order) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('widget_order', order);
+    _widgetOrder = order;
+    notifyListeners();
+  }
 
   Future<void> fetchDashboard() async {
     if (!connectionProvider.isConnected) {
@@ -76,6 +96,19 @@ class DashboardProvider extends ChangeNotifier {
       _plugins = (dataList as List<dynamic>)
           .map((item) => PluginData.fromJson(item as Map<String, dynamic>))
           .toList();
+      
+      final historyData = jsonData['history'];
+      if (historyData != null && historyData is Map) {
+        _metricsHistory = {
+          'cpu': (historyData['cpu'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ?? [],
+          'memory': (historyData['memory'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ?? [],
+        };
+      }
+      
       _errorMessage = null;
     } catch (e) {
       _errorMessage = 'Failed to fetch data: ${e.toString()}';

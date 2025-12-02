@@ -175,6 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     widget,
                     onActionExecute: () =>
                         _executeCommand(widget, connectionProvider),
+                    metricsHistory: dashboardProvider.metricsHistory,
                   ),
                 ),
               );
@@ -197,6 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         leftWidget,
                         onActionExecute: () =>
                             _executeCommand(leftWidget, connectionProvider),
+                        metricsHistory: dashboardProvider.metricsHistory,
                       ),
                     ),
                     if (rightWidget != null) ...[
@@ -208,6 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           rightWidget,
                           onActionExecute: () =>
                               _executeCommand(rightWidget, connectionProvider),
+                          metricsHistory: dashboardProvider.metricsHistory,
                         ),
                       ),
                     ],
