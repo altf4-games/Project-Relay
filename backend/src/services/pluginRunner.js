@@ -61,7 +61,7 @@ const executeScript = async (scriptPath) => {
       return resolve(null);
     }
 
-    exec(command, { timeout: 10000 }, (error, stdout, stderr) => {
+    exec(command, { timeout: 5000 }, (error, stdout, stderr) => {
       if (error) {
         console.error(
           `Plugin error (${path.basename(scriptPath)}):`,
@@ -80,15 +80,37 @@ const executeScript = async (scriptPath) => {
 
       try {
         const result = JSON.parse(stdout);
+        
+        // Validate plugin output structure
+        if (!result || typeof result !== 'object') {
+          throw new Error('Plugin output must be an object');
+        }
+        if (!result.title || typeof result.title !== 'string') {
+          throw new Error('Plugin output must have a title string');
+        }
+        if (!Array.isArray(result.widgets)) {
+          throw new Error('Plugin output must have a widgets array');
+        }
+        
+        // Validate each widget has required fields
+        for (const widget of result.widgets) {
+          if (!widget.type || typeof widget.type !== 'string') {
+            throw new Error('Each widget must have a type string');
+          }
+          if (!widget.data || typeof widget.data !== 'object') {
+            throw new Error('Each widget must have a data object');
+          }
+        }
+        
         resolve(result);
       } catch (parseError) {
         console.error(
-          `JSON parse error (${path.basename(scriptPath)}):`,
+          `JSON validation error (${path.basename(scriptPath)}):`,
           parseError.message
         );
         resolve({
           title: path.basename(scriptPath, ext),
-          error: "Invalid JSON output",
+          error: "Invalid plugin output format",
           widgets: [],
         });
       }

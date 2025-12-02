@@ -26,17 +26,16 @@ class BiometricService {
       // Handle specific error cases
       if (e.code == 'NotAvailable' ||
           e.code == 'NotEnrolled' ||
-          e.code == 'LockedOut' ||
-          e.code == 'PermanentlyLockedOut' ||
           e.message?.contains('activity') == true) {
         // If biometrics not set up or activity issue, allow access
         return true;
       }
-      // User cancelled or other errors
+      // User cancelled, locked out, or authentication failed
       return false;
     } catch (e) {
-      // Unknown error, allow access for better UX
-      return true;
+      // Unknown error - fail securely
+      // Log error but don't expose details to user
+      return false;
     }
   }
 }

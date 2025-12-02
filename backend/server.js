@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 import { runPlugins } from "./src/services/pluginRunner.js";
 import { collectMetrics } from "./src/services/metricsCollector.js";
 
@@ -21,17 +22,64 @@ collectMetrics();
 
 app.use(express.json());
 
+// Rate limiting to prevent brute force attacks
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_ATTEMPTS = 20;
+
+const rateLimitMiddleware = (req, res, next) => {
+  const clientIp = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  
+  if (!rateLimitMap.has(clientIp)) {
+    rateLimitMap.set(clientIp, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return next();
+  }
+  
+  const record = rateLimitMap.get(clientIp);
+  
+  if (now > record.resetTime) {
+    record.count = 1;
+    record.resetTime = now + RATE_LIMIT_WINDOW;
+    return next();
+  }
+  
+  if (record.count >= MAX_ATTEMPTS) {
+    return res.status(429).json({ error: "Too many requests" });
+  }
+  
+  record.count++;
+  next();
+};
+
 const authMiddleware = (req, res, next) => {
   const clientSecret = req.headers["x-agent-secret"];
 
-  if (!clientSecret || clientSecret !== AGENT_SECRET) {
+  if (!clientSecret || typeof clientSecret !== 'string') {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  // Constant-time comparison to prevent timing attacks
+  try {
+    const clientBuffer = Buffer.from(clientSecret);
+    const serverBuffer = Buffer.from(AGENT_SECRET);
+    
+    // Only compare if lengths match (constant-time length check)
+    if (clientBuffer.length !== serverBuffer.length) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (!crypto.timingSafeEqual(clientBuffer, serverBuffer)) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+  } catch (error) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   next();
 };
 
-app.get("/api/status", authMiddleware, async (req, res) => {
+app.get("/api/status", rateLimitMiddleware, authMiddleware, async (req, res) => {
   try {
     const pluginResults = await runPlugins();
     const { getMetricsHistory } = await import(

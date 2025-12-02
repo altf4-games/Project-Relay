@@ -55,8 +55,22 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Use port forwarding instead of executing curl with user-controlled values
+      // This prevents command injection through config.agentSecret or config.agentPort
+      final escapedSecret = config.agentSecret
+          .replaceAll('\\', '\\\\')
+          .replaceAll('"', '\\"')
+          .replaceAll('\$', '\\\$')
+          .replaceAll('`', '\\`');
+      
+      // Validate port is actually a number to prevent injection
+      final port = config.agentPort;
+      if (port < 1 || port > 65535) {
+        throw Exception('Invalid port number');
+      }
+      
       final command =
-          'curl -s -H "x-agent-secret: ${config.agentSecret}" http://127.0.0.1:${config.agentPort}/api/status';
+          'curl -s -H "x-agent-secret: $escapedSecret" "http://127.0.0.1:$port/api/status"';
       final result = await connectionProvider.sshClient.execute(command);
 
       if (result.isEmpty) {
