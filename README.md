@@ -4,6 +4,12 @@
 
 Project Relay enables you to monitor and manage your VPS infrastructure from your mobile device. It establishes an SSH tunnel to securely access a lightweight Node.js agent running on your server, displaying real-time system metrics and executing remote commands.
 
+## Download
+
+[![Download APK](https://img.shields.io/badge/Download-Android%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/altf4-games/Project-Relay/releases/download/Release/Relay.apk)
+
+For iOS, you'll need to build from source using Xcode.
+
 ## Key Features
 
 - **Secure SSH Tunneling**: All communication flows through encrypted SSH connections - no exposed ports
