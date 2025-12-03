@@ -59,10 +59,15 @@ class SshClientService {
       final output = await utf8.decoder.bind(session.stdout).join();
       final stderr = await utf8.decoder.bind(session.stderr).join();
 
-      if (stderr.isNotEmpty) {
-        throw Exception('Command error: $stderr');
+      // Check exit code instead of stderr (many commands write info to stderr)
+      final exitCode = await session.exitCode;
+      
+      if (exitCode != null && exitCode != 0) {
+        // Non-zero exit code indicates actual error
+        throw Exception('Command failed (exit code $exitCode): ${stderr.isNotEmpty ? stderr : output}');
       }
 
+      // Return stdout even if there was stderr (warnings/info messages are common)
       return output;
     } catch (e) {
       throw Exception('Command execution failed: ${e.toString()}');
