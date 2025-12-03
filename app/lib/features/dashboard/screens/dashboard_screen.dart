@@ -33,10 +33,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final command = widget.data['command'] as String?;
     if (command == null || command.isEmpty) return;
 
+    final label = widget.data['label'] as String? ?? 'this action';
+
+    // Show confirmation dialog for potentially dangerous commands
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Action'),
+        content: Text('Are you sure you want to execute: $label?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Execute'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
     try {
+      // Show progress indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 12),
+                Text('Executing command...'),
+              ],
+            ),
+            duration: Duration(minutes: 5),
+          ),
+        );
+      }
+
       await connectionProvider.sshClient.execute(command);
 
       if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Command executed successfully'),
@@ -51,6 +95,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     } catch (e) {
       if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Command failed: $e'),

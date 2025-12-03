@@ -64,7 +64,7 @@ Every plugin must output valid JSON to stdout:
 }
 ```
 
-**action_button**: Execute a command via SSH
+**action_button**: Execute a command via SSH (requires user confirmation)
 
 ```json
 {
@@ -72,13 +72,16 @@ Every plugin must output valid JSON to stdout:
   "data": {
     "label": "Restart Service",
     "command": "systemctl restart nginx"
-  }
+  },
+  "gridWidth": 2
 }
 ```
 
+**Note**: Action buttons show a confirmation dialog before execution. Use `gridWidth: 2` for full-width buttons.
+
 ## Pre-installed Plugins
 
-The agent comes with 5 verified, safe plugins:
+The agent comes with 6 verified, safe plugins:
 
 ### 00_system_vitals.py
 
@@ -86,6 +89,14 @@ The agent comes with 5 verified, safe plugins:
 - **Dependencies**: `psutil` (Python package)
 - **Security**: Read-only system metrics
 - **Verified**: ✅ Safe
+
+### 10_system_update.py
+
+- **Purpose**: System update and upgrade button (only shown for root user)
+- **Dependencies**: `apt-get` (Debian/Ubuntu)
+- **Security**: Executes `apt-get update && apt-get upgrade -y`
+- **Root Required**: ⚠️ Only displays when logged in as root
+- **Verified**: ✅ Safe (interactive confirmation required)
 
 ### 10_disk_usage.py
 
